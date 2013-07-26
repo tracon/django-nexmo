@@ -4,6 +4,7 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+outbox = []
 
 def send_message(to, message):
     """Shortcut to send a sms using libnexmo api.
@@ -30,8 +31,10 @@ def send_message(to, message):
             sms.text,
         ))
 
-    if not settings.NEXMO_TEST_MODE:
+    if settings.NEXMO_TEST_MODE:
+        outbox.append(sms)
+    else:
         response = sms.send_request()
         return response
-        
+
     return False
