@@ -1,5 +1,8 @@
+import logging
 from .libpynexmo.nexmomessage import NexmoMessage
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 def send_message(to, message):
@@ -18,6 +21,17 @@ def send_message(to, message):
         'to': to,
         'text': message.encode('utf-8'),
     }
+
     sms = NexmoMessage(params)
-    response = sms.send_request()
-    return response
+
+    if settings.NEXMO_LOG:
+        logger.info(u'Nexmo outbound SMS to: %s, message: %s' % (
+            sms.to,
+            sms.text,
+        ))
+
+    if not settings.NEXMO_TEST_MODE:
+        response = sms.send_request()
+        return response
+        
+    return False
