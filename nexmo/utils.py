@@ -27,8 +27,8 @@ def send_message(to, message):
 
     if settings.NEXMO_LOG:
         logger.info(u'Nexmo outbound SMS to: %s, message: %s' % (
-            sms.sms.to,
-            sms.sms.text,
+            sms.sms['to'],
+            sms.sms['text'],
         ))
 
     if settings.NEXMO_TEST_MODE:
