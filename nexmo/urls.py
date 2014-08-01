@@ -3,5 +3,6 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns(
     'nexmo.views',
-    url(r'^callback/$', 'callback', name='nexmo_callback'),
+    url(r'^nexmo/delivery/$', 'nexmo_delivery', name='nexmo_delivery'),
+    url(r'^nexmo/message/$', 'nexmo_message', name='nexmo_message'),
 )
