@@ -27,8 +27,8 @@ def nexmo_message(request):
     messageId = request.GET.get('messageId')
     message_text = request.GET.get('text')
     concat_ref = request.GET.get('concat-ref')
-    concat_part = request.GET.get('concat-part')
-    concat_total = request.GET.get('concat-total')
+    concat_part = int(request.GET.get('concat-part'))
+    concat_total = int(request.GET.get('concat-total'))
     timestamp = request.GET.get('message-timestamp')
 
     message = InboxTmp(messageId=messageId, message=message_text, concat_ref=concat_ref, concat_part=concat_part, concat_total=concat_total, nexmo_timestamp=timestamp)

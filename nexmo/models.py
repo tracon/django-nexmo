@@ -1,7 +1,7 @@
 # encoding: utf-8
 from datetime import datetime
 
-from django.db import models
+from django.db import models, connection
 import django.dispatch
 
 message_received = django.dispatch.Signal(providing_args=["messageId"])
@@ -38,15 +38,13 @@ class InboxTmp(models.Model):
 		help_text=u"Nexmo erittelee viestin eri osat tällä yksilöintitiedolla.",
 	)
 
-	concat_part = models.CharField(
-		max_length=255,
+	concat_part = models.IntegerField(
 		null=True,
 		blank=True,
 		verbose_name=u"Moniosaisen viestin järjestysnumero",
 	)
 
-	concat_total = models.CharField(
-		max_length=255,
+	concat_total = models.IntegerField(
 		null=True,
 		blank=True,
 		verbose_name=u"Moniosaisen viestin palojen kokonaismäärä.",
@@ -56,11 +54,14 @@ class InboxTmp(models.Model):
 		if self.concat_ref:
 			ret_val = super(InboxTmp, self).save(*args, **kwargs)
 			pieces = InboxTmp.objects.filter(concat_ref=self.concat_ref).order_by('concat_part')
+			if connection.vendor != "sqlite":
+				pieces = pieces.distinct("concat_part")
 			if len(pieces) >= self.concat_total:
 				message_pieces = pieces.values_list('message', flat=True)
 				message = u"".join(message_pieces)
 				normal = Inbox(messageId=self.messageId, message=message, nexmo_timestamp=self.nexmo_timestamp, receive_timestamp=datetime.now())
 				normal.save()
+				InboxTmp.objects.filter(concat_ref=self.concat_ref).delete()
 
 		else:
 			normal = Inbox(messageId=self.messageId, message=self.message, nexmo_timestamp=self.nexmo_timestamp, receive_timestamp=datetime.now())
