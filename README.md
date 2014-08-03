@@ -54,14 +54,22 @@ Sending messages is little bit harder than basic usage:
     message = OutboundMessage(message=u'My sms message body', to=u'+123465789', external_reference=u'test')
     message.send()
 
-Nexmo allows 5 messages per second. If you are throttled, EnvironmentError is raised.
+Nexmo allows 5 messages per second. If you are throttled, EnvironmentError is raised. Messages and delivery data 
+are saved to the database.
 
 External reference allows you to mark messages however you want. If you want to track which app send the message
 or which user account was used or whatever you want, you can put it there.
 
-All messages sent this way is saved to the database. Delivery statuses are also saved to the database.
+If you have inbound number from Nexmo, you can receive text messages. Multi-part messages are supported. Inbound
+messages sends signal which you can catch f.ex. for processing hot words:
 
-If you have inbound number from Nexmo, you can receive text messages. Multi-part messages are supported.
+    from django.dispatch import receiver
+    from nexmo.models import InboundMessage
+
+    @receiver(message_received, sender=InboundMessage)
+    def my_handler(sender, **kwargs):
+        message = InboundMessage.objects.filter(messageId=messageId)
+        ...
 
 All text messages can be read from admin-panel.
 
@@ -72,7 +80,6 @@ Therefore, you can import and use the `NexmoMessage` class to manually forge
 requests to the Nexmo API.
 
     from nexmo.libpynexmo.nexmomessage import NexmoMessage
-
 
     params = {
         'api_key': settings.NEXMO_USERNAME,
