@@ -30,4 +30,25 @@ NEXMO_MESSAGES = {
     99: _('General Error'),
 }
 
+NEXMO_SEND_STATUS = {
+    0: _('Success'),
+    1: _('Throttled'),
+    2: _('Missing params'),
+    3: _('Invalid params'),
+    4: _('Invalid credentials'),
+    5: _('Internal error'),
+    6: _('Invalid message'),
+    7: _('Number barred'),
+    8: _('Partner account barred'),
+    9: _('Partner quota exceeded'),
+    11: _('Account not enabled for REST'),
+    12: _('Message too long'),
+    13: _('Communication Failed'),
+    14: _('Invalid Signature'),
+    15: _('Invalid sender address'),
+    16: _('Invalid TTL'),
+    19: _('Facility not allowed'),
+    20: _('Invalid Message class'),
+}
+
 UNKNOWN_MESSAGE = _('Unknown error')

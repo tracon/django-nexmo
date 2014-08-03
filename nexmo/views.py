@@ -1,37 +1,40 @@
-import logging
+from django.http import HttpResponse, HttpResponseForbidden
 
-from django.http import HttpResponse
+from .models import InboundMessageFragment, OutboundMessage
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
-from .error_messages import (NEXMO_STATUSES, UNKNOWN_STATUS,
-                             NEXMO_MESSAGES, UNKNOWN_MESSAGE)
+@require_POST
+@csrf_exempt
+def nexmo_delivery(request, key):
+    if key != settings.NEXMO_INBOUND_KEY:
+        return HttpResponseForbidden()
+    ref_id = int(request.POST.get('client-ref'))
+    timestamp = request.POST.get('message-timestamp')
+    error_id = int(request.POST.get('err-code'))
 
-from .models import InboxTmp
-
-logger = logging.getLogger(__name__)
-
-def nexmo_delivery(request):
-    """Callback URL for Nexmo."""
-    message_id = request.GET.get('messageId')
-    status_id = request.GET.get('status')
-    status_msg = NEXMO_STATUSES.get(status_id, UNKNOWN_STATUS)
-    error_id = int(request.GET.get('err-code'))
-    error_msg = NEXMO_MESSAGES.get(error_id, UNKNOWN_MESSAGE)
-
-    
+    status = OutboundMessage()
+    status.delivery(ref_id,error_id,timestamp)
 
     # Nexmo expects a 200 response code
     return HttpResponse('')
 
-def nexmo_message(request):
-    """Callback URL for Nexmo."""
-    messageId = request.GET.get('messageId')
-    message_text = request.GET.get('text')
-    concat_ref = request.GET.get('concat-ref')
-    concat_part = int(request.GET.get('concat-part'))
-    concat_total = int(request.GET.get('concat-total'))
-    timestamp = request.GET.get('message-timestamp')
+@require_POST
+@csrf_exempt
+def nexmo_message(request, key):
+    if key != settings.NEXMO_INBOUND_KEY:
+        return HttpResponseForbidden()
+    messageId = request.POST.get('messageId')
+    message_text = request.POST.get('text')
+    sender = request.POST.get('msisdn')
+    concat_ref = request.POST.get('concat-ref')
+    concat_part = int(request.POST.get('concat-part') or 0 )
+    concat_total = int(request.POST.get('concat-total') or 0 )
+    timestamp = request.POST.get('message-timestamp')
 
-    message = InboxTmp(messageId=messageId, message=message_text, concat_ref=concat_ref, concat_part=concat_part, concat_total=concat_total, nexmo_timestamp=timestamp)
+    # Magic happens in the InboundMessageFragment. If the message was single-part, it will be saved directly to the InboundMessage. Multi-part messages will be saved to InboundMessage when all the parts are received.
+    message = InboundMessageFragment(messageId=messageId, message=message_text, sender=sender, concat_ref=concat_ref, concat_part=concat_part, concat_total=concat_total, nexmo_timestamp=timestamp)
     message.save()
 
     # Nexmo expects a 200 response code

@@ -17,24 +17,13 @@ def send_message(to, message):
     params = {
         'api_key': settings.NEXMO_USERNAME,
         'api_secret': settings.NEXMO_PASSWORD,
-        'type': 'unicode',
         'from': settings.NEXMO_FROM,
         'to': to,
+        'status-report-req': 0,
         'text': message.encode('utf-8'),
     }
 
     sms = NexmoMessage(params)
 
-    #if settings.NEXMO_LOG:
-    #    logger.info(u'Nexmo outbound SMS to: %s, message: %s' % (
-    #        sms.sms['to'],
-    #        sms.sms['text'],
-    #    ))
-
-    if settings.NEXMO_TEST_MODE:
-        outbox.append(sms)
-    else:
-        response = sms.send_request()
-        return response
-
-    return False
+    response = sms.send_request()
+    return response
