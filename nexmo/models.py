@@ -85,8 +85,8 @@ class InboundMessageFragment(models.Model):
         return self.message
 
     class Meta:
-        verbose_name = u'InboundMessage'
-        verbose_name_plural = u'InboundMessage'
+        verbose_name = u'Inbound Message Fragment'
+        verbose_name_plural = u'Inbound Message Fragments'
 
 class InboundMessage(models.Model):
 
@@ -130,8 +130,8 @@ class InboundMessage(models.Model):
         return self.message
 
     class Meta:
-        verbose_name = u'InboundMessage'
-        verbose_name_plural = u'InboundMessage'
+        verbose_name = u'Inbound Message'
+        verbose_name_plural = u'Inbound Messages'
 
 class OutboundMessage(models.Model):
     
@@ -198,5 +198,5 @@ class OutboundMessage(models.Model):
         return True
 
     class Meta:
-        verbose_name = u'OutboundMessage'
-        verbose_name_plural = u'OutboundMessage'
+        verbose_name = u'Outbound Message'
+        verbose_name_plural = u'Outbound Messages'
