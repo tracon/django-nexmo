@@ -20,7 +20,7 @@ status_explained.short_description = "Status"
 
 def code_explained(obj):
     return NEXMO_MESSAGES.get(obj.error_code, UNKNOWN_STATUS)
-code_explained.short_description = "Välitysstatus"
+code_explained.short_description = "Virhestatus"
 
 def status_msg_explained(obj):
     return NEXMO_STATUSES.get(obj.status_msg, UNKNOWN_STATUS)
