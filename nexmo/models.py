@@ -2,6 +2,8 @@
 
 from .libpynexmo.nexmomessage import NexmoMessage
 
+from datetime import tzinfo,timedelta
+
 from django.conf import settings
 from django.db import models, connection
 import django.dispatch
@@ -145,7 +147,8 @@ class OutboundMessage(models.Model):
 
     send_timestamp = models.DateTimeField(
         verbose_name=u'Viestin lähetyshetki',
-        auto_now=True,
+        null=True,
+        blank=True,
     )
 
     send_status = models.IntegerField(
@@ -160,8 +163,8 @@ class OutboundMessage(models.Model):
         blank=True,
     )
 
-    status_timestamp = models.DateTimeField(
-        verbose_name=u'Statuksen saantihetki',
+    sent_pieces = models.IntegerField(
+        verbose_name=u'Fyysisten viestien määrä',
         null=True,
         blank=True,
     )
@@ -173,7 +176,7 @@ class OutboundMessage(models.Model):
     )
 
     def send(self, *args, **kwargs):
-        msg = OutboundMessage(message=self.message,to=self.to,external_reference=self.external_reference)
+        msg = OutboundMessage(message=self.message,to=self.to,status=0,external_reference=self.external_reference)
         msg.save()
         params = {
             'api_key': settings.NEXMO_USERNAME,
@@ -187,12 +190,12 @@ class OutboundMessage(models.Model):
 
         sms = NexmoMessage(params)
         response = sms.send_request()
+        msg.sent_pieces = response['message-count']
+        msg.status = 1
+        msg.send_timestamp = django.utils.timezone.now()
         for resp in response['messages']:
-            msg.send_status = resp['status'];
-            msg.save();
-            if resp['status'] == u'0':
-                delivery = DeliveryStatusFragment(message=msg, messageId=resp['message-id'])
-                delivery.save()
+            msg.send_status = resp['status']
+            msg.save()
             if resp['status'] == u'1':
                 # Throttled. Sending signal to retry.
                 raise RetryError("Throttled")
@@ -224,7 +227,21 @@ class DeliveryStatusFragment(models.Model):
         blank=True,
     )
 
-
+    def save(self, *args, **kwargs):
+        ret_val = super(DeliveryStatusFragment, self).save(*args, **kwargs)
+        pieces = DeliveryStatusFragment.objects.filter(message=self.message)
+        message = OutboundMessage.objects.get(pk=self.message.id)
+        if connection.vendor != "sqlite":
+            pieces = pieces.distinct("messageId")
+        if len(pieces) >= message.sent_pieces:
+            return_code = 2
+            for piece in pieces:
+                if piece.error_code != 0:
+                    return_code = 3
+                    break
+            message.status = return_code
+            message.save()
+        return ret_val
 
 
 class RetryError(RuntimeError):
@@ -236,3 +253,15 @@ class RetryError(RuntimeError):
 
     def __init__(self, msg):
         self.msg = msg
+
+class Zone(tzinfo):
+    def __init__(self,offset,isdst,name):
+        self.offset = offset
+        self.isdst = isdst
+        self.name = name
+    def utcoffset(self, dt):
+        return timedelta(hours=self.offset) + self.dst(dt)
+    def dst(self, dt):
+            return timedelta(hours=1) if self.isdst else timedelta(0)
+    def tzname(self,dt):
+         return self.name

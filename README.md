@@ -118,4 +118,4 @@ Inbound text messages are received the same way. Receiving messages is accessibl
 http://your-site.url/nexmo/message/NEXMO_INBOUND_KEY/ url.
 
 Copy this url and and paste it in the "Numbers" section of your Nexmo.com account. You will need to buy number
-from Nexmo for this, and it will cost you monthly fee of few dollars (in U.S.A: $0.90/month, in Finland €3.00 /month)
+from Nexmo for this, and it will cost you monthly fee of few dollars (in U.S.A: $0.90/month, in Finland €3.00/month)

@@ -30,6 +30,13 @@ NEXMO_MESSAGES = {
     99: _('General Error'),
 }
 
+NEXMO_DELIVERY_STATUS = {
+    0: _('Queued'),
+    1: _('In Transit'),
+    2: _('Delivered'),
+    3: _('Error in delivery'),
+}
+
 NEXMO_SEND_STATUS = {
     0: _('Success'),
     1: _('Throttled'),
