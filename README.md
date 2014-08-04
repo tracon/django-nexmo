@@ -54,7 +54,7 @@ Sending messages is little bit harder than basic usage:
     message = OutboundMessage(message=u'My sms message body', to=u'+123465789', external_reference=u'test')
     message.send()
 
-Nexmo allows 5 messages per second. If you are throttled, EnvironmentError is raised. Messages and delivery data 
+Nexmo allows 5 messages per second. If you are throttled, RetryError is raised. Messages and delivery data 
 are saved to the database.
 
 External reference allows you to mark messages however you want. If you want to track which app send the message

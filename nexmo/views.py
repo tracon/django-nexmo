@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseForbidden
 
-from .models import InboundMessageFragment, OutboundMessage
+from .models import InboundMessageFragment, DeliveryStatusFragment
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -10,12 +10,14 @@ from django.conf import settings
 def nexmo_delivery(request, key):
     if key != settings.NEXMO_INBOUND_KEY:
         return HttpResponseForbidden()
-    ref_id = int(request.POST.get('client-ref'))
+    ref_id = int(request.POST.get('client-ref' or 0))
+    messageId = request.POST.get('messageId')
     timestamp = request.POST.get('message-timestamp')
     error_id = int(request.POST.get('err-code'))
 
-    status = OutboundMessage()
-    status.delivery(ref_id,error_id,timestamp)
+    if ref_id != 0:
+        status = DeliveryStatusFragment(message=ref_id,messageId=messageId,error_code=error_id,status_timestamp=timestamp)
+        status.save()
 
     # Nexmo expects a 200 response code
     return HttpResponse('')

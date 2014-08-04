@@ -4,7 +4,6 @@ from .libpynexmo.nexmomessage import NexmoMessage
 
 from django.conf import settings
 from django.db import models, connection
-from django.shortcuts import get_object_or_404
 import django.dispatch
 
 message_received = django.dispatch.Signal(providing_args=["messageId"])
@@ -188,15 +187,52 @@ class OutboundMessage(models.Model):
 
         sms = NexmoMessage(params)
         response = sms.send_request()
+        for resp in response['messages']:
+            msg.send_status = resp['status'];
+            msg.save();
+            if resp['status'] == u'0':
+                delivery = DeliveryStatusFragment(message=msg, messageId=resp['message-id'])
+                delivery.save()
+            if resp['status'] == u'1':
+                # Throttled. Sending signal to retry.
+                raise RetryError("Throttled")
         return response
-
-    def delivery(request, ref_id, status, timestamp):
-        msg = get_object_or_404(OutboundMessage, pk=ref_id)
-        msg.status = status
-        msg.status_timestamp = timestamp
-        msg.save()
-        return True
 
     class Meta:
         verbose_name = u'Outbound Message'
         verbose_name_plural = u'Outbound Messages'
+
+class DeliveryStatusFragment(models.Model):
+
+    message = models.ForeignKey(OutboundMessage)
+
+    messageId = models.CharField(
+        max_length=255,
+        verbose_name=u"Nexmon yksilöintitieto",
+        help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
+    )
+
+    error_code = models.IntegerField(
+        verbose_name=u'Viestin status',
+        null=True,
+        blank=True,
+    )
+
+    status_timestamp = models.DateTimeField(
+        verbose_name=u'Statuksen saantihetki',
+        null=True,
+        blank=True,
+    )
+
+
+
+
+class RetryError(Exception):
+    """Exception raised for errors which needs trying again after short short wait.
+
+    Attributes:
+        msg  -- explanation of the error
+    """
+
+    def __init__(self, msg):
+        self.msg = msg
