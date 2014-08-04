@@ -77,17 +77,14 @@ All text messages can be read from admin-panel.
 
 `django-nexmo` embeds [libpynexmo by Marco Londero](https://github.com/marcuz/libpynexmo).
 Therefore, you can import and use the `NexmoMessage` class to manually forge
-requests to the Nexmo API.
+requests to the Nexmo API. To fetch your balance for example:
 
     from nexmo.libpynexmo.nexmomessage import NexmoMessage
 
     params = {
         'api_key': settings.NEXMO_USERNAME,
         'api_secret': settings.NEXMO_PASSWORD,
-        'type': 'text',
-        'from': settings.NEXMO_FROM,
-        'to': to,
-        'text': message.encode('utf-8'),
+        'type': 'balance',
     }
     sms = NexmoMessage(params)
     response = sms.send_request()
