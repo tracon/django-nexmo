@@ -6,7 +6,16 @@ from .models import (
     InboundMessage,
     OutboundMessage
 )
+from .error_messages import (NEXMO_SEND_STATUS, UNKNOWN_STATUS,
+                             NEXMO_MESSAGES, UNKNOWN_MESSAGE)
 
+def send_status_explained(obj):
+    return NEXMO_SEND_STATUS.get(obj.send_status, UNKNOWN_STATUS)
+send_status_explained.short_description = "Lähetysstatus"
+
+def status_explained(obj):
+    return NEXMO_MESSAGES.get(obj.status, UNKNOWN_MESSAGE)
+status_explained.short_description = "Välitysstatus"
 
 class InboxAdmin(admin.ModelAdmin):
     model = InboundMessage
@@ -16,6 +25,7 @@ class InboxAdmin(admin.ModelAdmin):
 
 class OutboxAdmin(admin.ModelAdmin):
     model = OutboundMessage
+    list_display = ['to', 'send_timestamp', send_status_explained, status_explained, 'message', 'external_reference']
     def has_add_permission(self,request):
         return False
 

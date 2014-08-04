@@ -10,7 +10,7 @@ from django.conf import settings
 def nexmo_delivery(request, key):
     if key != settings.NEXMO_INBOUND_KEY:
         return HttpResponseForbidden()
-    ref_id = int(request.POST.get('client-ref' or 0))
+    ref_id = int(request.POST.get('client-ref') or 0)
     messageId = request.POST.get('messageId')
     timestamp = request.POST.get('message-timestamp')
     error_id = int(request.POST.get('err-code'))

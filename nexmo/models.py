@@ -227,8 +227,8 @@ class DeliveryStatusFragment(models.Model):
 
 
 
-class RetryError(Exception):
-    """Exception raised for errors which needs trying again after short short wait.
+class RetryError(RuntimeError):
+    """Exception raised for errors which needs trying again after short wait.
 
     Attributes:
         msg  -- explanation of the error

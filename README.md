@@ -46,7 +46,7 @@ Is that all? Yes… for now. Messages sent this way aren't saved anywhere though
 
 ## Typical usage
 
-The `nexmo` app typical usage will be sending messages and tracking delivery process and receiving messages.
+The `nexmo` app typical usage will be sending messages, tracking delivery process and receiving messages.
 
 Sending messages is little bit harder than basic usage:
 
@@ -111,8 +111,8 @@ This will declare a callback view accessible through the
 http://your-site.url/nexmo/delivery/NEXMO_INBOUND_KEY/ url.
 
 Copy this url and paste it in the "Callback URL" section of your "API settings"
-section of your Nexmo.com account. Remember to replace NEXMO_INBOUND_KEY to whatever you set to settings.
-Hex numbers are allowed.
+section of your Nexmo.com account and select POST in drop-down menu. Remember to replace NEXMO_INBOUND_KEY to whatever
+you set to settings. Hex numbers are allowed.
 
 Inbound text messages are received the same way. Receiving messages is accessible through the
 http://your-site.url/nexmo/message/NEXMO_INBOUND_KEY/ url.
