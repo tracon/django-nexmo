@@ -221,7 +221,8 @@ class DeliveryStatusFragment(models.Model):
         blank=True,
     )
 
-    status_msg = models.IntegerField(
+    status_msg = models.CharField(
+        max_length=50,
         verbose_name=u'Viestin status',
         null=True,
         blank=True,

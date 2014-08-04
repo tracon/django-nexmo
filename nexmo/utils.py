@@ -27,3 +27,22 @@ def send_message(to, message):
 
     response = sms.send_request()
     return response
+
+def get_balance():
+    """Shortcut to check balance.
+
+    Usage:
+
+    >>> from nexmo import get_balance
+    >>> get_balance()
+    """
+
+    params = {
+        'api_key': settings.NEXMO_USERNAME,
+        'api_secret': settings.NEXMO_PASSWORD,
+        'type': 'balance'
+    }
+
+    sms = NexmoMessage(params)
+    response = sms.send_request()
+    return response['value']
