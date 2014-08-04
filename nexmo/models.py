@@ -216,6 +216,12 @@ class DeliveryStatusFragment(models.Model):
     )
 
     error_code = models.IntegerField(
+        verbose_name=u'Viestin virhestatus',
+        null=True,
+        blank=True,
+    )
+
+    status_msg = models.IntegerField(
         verbose_name=u'Viestin status',
         null=True,
         blank=True,

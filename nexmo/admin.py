@@ -7,7 +7,7 @@ from .models import (
     OutboundMessage,
     DeliveryStatusFragment
 )
-from .error_messages import (NEXMO_SEND_STATUS, UNKNOWN_STATUS,
+from .error_messages import (NEXMO_SEND_STATUS, NEXMO_STATUSES, UNKNOWN_STATUS,
                              NEXMO_DELIVERY_STATUS, NEXMO_MESSAGES, UNKNOWN_MESSAGE)
 
 def send_status_explained(obj):
@@ -19,8 +19,12 @@ def status_explained(obj):
 status_explained.short_description = "Status"
 
 def code_explained(obj):
-    return NEXMO_MESSAGES.get(obj.error_code, UNKNOWN_MESSAGE)
+    return NEXMO_MESSAGES.get(obj.error_code, UNKNOWN_STATUS)
 code_explained.short_description = "Välitysstatus"
+
+def status_msg_explained(obj):
+    return NEXMO_STATUSES.get(obj.status_msg, UNKNOWN_STATUS)
+status_msg_explained.short_description = "Välitysstatus"
 
 class InboxAdmin(admin.ModelAdmin):
     model = InboundMessage
@@ -31,8 +35,8 @@ class InboxAdmin(admin.ModelAdmin):
 
 class DSFAdmin(admin.TabularInline):
     model = DeliveryStatusFragment
-    readonly_fields = ['messageId', code_explained, 'status_timestamp']
-    fields = ['messageId', code_explained, 'status_timestamp']
+    readonly_fields = ['messageId', code_explained, status_msg_explained, 'status_timestamp']
+    fields = ['messageId', code_explained, status_msg_explained, 'status_timestamp']
     def has_add_permission(self,request):
         return False
 

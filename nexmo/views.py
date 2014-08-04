@@ -17,13 +17,14 @@ def nexmo_delivery(request, key):
     ref_id = int(request.POST.get('client-ref') or 0)
     messageId = request.POST.get('messageId')
     timestamp = request.POST.get('message-timestamp')
+    status_msg = request.POST.get('status')
     error_id = int(request.POST.get('err-code') or 0)
 
     GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=GMT)
 
     if ref_id != 0:
         message = OutboundMessage.objects.get(pk=ref_id)
-        status = DeliveryStatusFragment(message=message, messageId=messageId, error_code=error_id, status_timestamp=GMTtimestamp)
+        status = DeliveryStatusFragment(message=message, messageId=messageId, error_code=error_id, status_msg=status_msg, status_timestamp=GMTtimestamp)
         status.save()
 
     # Nexmo expects a 200 response code
