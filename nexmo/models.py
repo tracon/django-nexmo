@@ -8,11 +8,11 @@ from django.conf import settings
 from django.db import models, connection
 import django.dispatch
 
-message_received = django.dispatch.Signal(providing_args=["messageId"])
+message_received = django.dispatch.Signal(providing_args=["nexmo_message_id"])
 
 class InboundMessageFragment(models.Model):
     
-    messageId = models.CharField(
+    nexmo_message_id = models.CharField(
         max_length=255,
         verbose_name=u"Nexmon yksilöintitieto",
         help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
@@ -59,29 +59,6 @@ class InboundMessageFragment(models.Model):
         verbose_name=u"Moniosaisen viestin palojen kokonaismäärä.",
     )
 
-    def save(self, *args, **kwargs):
-        # Needed to make Nexmos api happy, as it tests the callback url with no parameters (and expects 200 OK) when you configure it.
-        if self.messageId is None:
-            return True
-        else:
-            if self.concat_ref:
-                ret_val = super(InboundMessageFragment, self).save(*args, **kwargs)
-                pieces = InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).order_by('concat_part')
-                if connection.vendor != "sqlite":
-                    pieces = pieces.distinct("concat_part")
-                if len(pieces) >= self.concat_total:
-                    message_pieces = pieces.values_list('message', flat=True)
-                    message = u"".join(message_pieces)
-                    normal = InboundMessage(messageId=self.messageId, message=message, sender=self.sender, nexmo_timestamp=self.nexmo_timestamp, receive_timestamp=django.utils.timezone.now())
-                    normal.save()
-                    InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).delete()
-
-            else:
-                normal = InboundMessage(messageId=self.messageId, message=self.message, sender=self.sender, nexmo_timestamp=self.nexmo_timestamp, receive_timestamp=django.utils.timezone.now())
-                ret_val = normal.save()
-
-        return ret_val
-
     def __unicode__(self):
         return self.message
 
@@ -91,7 +68,7 @@ class InboundMessageFragment(models.Model):
 
 class InboundMessage(models.Model):
 
-    messageId = models.CharField(
+    nexmo_message_id = models.CharField(
         max_length=255,
         verbose_name=u"Nexmon yksilöintitieto",
         help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
@@ -122,10 +99,54 @@ class InboundMessage(models.Model):
     def save(self, *args, **kwargs):
         ret_val = super(InboundMessage, self).save(*args, **kwargs)
 
-        if self.messageId:
-            message_received.send(sender=self.__class__, messageId=self.messageId)
+        if self.nexmo_message_id:
+            message_received.send(sender=self.__class__, nexmo_message_id=self.nexmo_message_id)
 
         return ret_val
+
+    @classmethod
+    def new_message(self, *args, **kwargs):
+        # Needed to make Nexmos api happy, as it tests the callback url with no parameters (and expects 200 OK) when you configure it.
+        if self.nexmo_message_id is None:
+            return True
+        else:
+            if self.concat_ref:
+                fragment = InboundMessageFragment(
+                    nexmo_message_id=self.nexmo_message_id,
+                    message=self.message,
+                    sender=self.sender,
+                    concat_ref=self.concat_ref,
+                    concat_part=self.concat_part,
+                    concat_total=self.concat_total,
+                    nexmo_timestamp=self.nexmo_timestamp,
+                    receive_timestamp=django.utils.timezone.now(),
+                )
+                fragment.save()
+                pieces = InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).order_by('concat_part')
+                if connection.vendor != "sqlite":
+                    pieces = pieces.distinct("concat_part")
+                if len(pieces) >= self.concat_total:
+                    message_pieces = pieces.values_list('message', flat=True)
+                    message = u"".join(message_pieces)
+                    normal = InboundMessage(
+                        nexmo_message_id=self.nexmo_message_id,
+                        message=message,
+                        sender=self.sender,
+                        nexmo_timestamp=self.nexmo_timestamp,
+                        receive_timestamp=django.utils.timezone.now(),
+                    )
+                    normal.save()
+                    InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).delete()
+
+            else:
+                normal = InboundMessage(
+                    nexmo_message_id=self.nexmo_message_id,
+                    message=self.message,
+                    sender=self.sender,
+                    nexmo_timestamp=self.nexmo_timestamp,
+                    receive_timestamp=django.utils.timezone.now(),
+                )
+                normal.save()
 
     def __unicode__(self):
         return self.message
@@ -175,27 +196,34 @@ class OutboundMessage(models.Model):
         help_text=u'Viittaus tapahtumaan/ohjelmaan/äänestykseen/whatnot.'
     )
 
+    @classmethod
     def send(self, *args, **kwargs):
-        msg = OutboundMessage(message=self.message,to=self.to,status=0,external_reference=self.external_reference)
-        msg.save()
+        message = OutboundMessage(message=self.message, to=self.to, external_reference=self.external_reference)
+        message.save()
+        self._send(message)
+
+    def _send(self, *args, **kwargs):
+        if self.message is None:
+            return ValueError("No message found.")
+
         params = {
             'api_key': settings.NEXMO_USERNAME,
             'api_secret': settings.NEXMO_PASSWORD,
             'from': settings.NEXMO_FROM,
             'to': self.to,
-            'client-ref': msg.id,
+            'client-ref': self.message.id,
             'status-report-req': 1,
             'text': self.message.encode('utf-8'),
         }
 
         sms = NexmoMessage(params)
         response = sms.send_request()
-        msg.sent_pieces = response['message-count']
-        msg.status = 1
-        msg.send_timestamp = django.utils.timezone.now()
+        self.message.sent_pieces = response['message-count']
+        self.message.status = 1
+        self.message.send_timestamp = django.utils.timezone.now()
         for resp in response['messages']:
-            msg.send_status = resp['status']
-            msg.save()
+            self.message.send_status = resp['status']
+            self.message.save()
             if resp['status'] == u'1':
                 # Throttled. Sending signal to retry.
                 raise RetryError("Throttled")
@@ -209,7 +237,7 @@ class DeliveryStatusFragment(models.Model):
 
     message = models.ForeignKey(OutboundMessage)
 
-    messageId = models.CharField(
+    nexmo_message_id = models.CharField(
         max_length=255,
         verbose_name=u"Nexmon yksilöintitieto",
         help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
@@ -234,12 +262,11 @@ class DeliveryStatusFragment(models.Model):
         blank=True,
     )
 
-    def save(self, *args, **kwargs):
-        ret_val = super(DeliveryStatusFragment, self).save(*args, **kwargs)
-        pieces = DeliveryStatusFragment.objects.filter(message=self.message)
-        message = OutboundMessage.objects.get(pk=self.message.id)
+    def handle_message_status(message):
+        pieces = DeliveryStatusFragment.objects.filter(message=message)
+        message = OutboundMessage.objects.get(pk=message.id)
         if connection.vendor != "sqlite":
-            pieces = pieces.distinct("messageId")
+            pieces = pieces.distinct("nexmo_message_id")
         if len(pieces) >= message.sent_pieces:
             return_code = 2
             for piece in pieces:
@@ -248,7 +275,6 @@ class DeliveryStatusFragment(models.Model):
                     break
             message.status = return_code
             message.save()
-        return ret_val
 
 
 class RetryError(RuntimeError):

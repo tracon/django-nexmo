@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequ
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from .models import InboundMessageFragment, DeliveryStatusFragment, OutboundMessage
+from .models import InboundMessage, DeliveryStatusFragment, OutboundMessage
 from .forms import DeliveryForm, MessageForm
 
 
@@ -24,12 +24,13 @@ def nexmo_delivery(request, key):
         message = OutboundMessage.objects.get(pk=ref_id)
         status = DeliveryStatusFragment(
             message=message,
-            messageId=form.cleaned_data['messageId'],
+            nexmo_message_id=form.cleaned_data['messageId'],
             error_code=form.cleaned_data['err-code'],
             status_msg=form.cleaned_data['status'],
             status_timestamp=form.cleaned_data['message-timestamp'],
         )
         status.save()
+        DeliveryStatusFragment.handle_message_status(message)
 
     # Nexmo expects a 200 response code
     return HttpResponse('')
@@ -47,8 +48,8 @@ def nexmo_message(request, key):
         return HttpResponseBadRequest
 
     # Magic happens in the InboundMessageFragment. If the message was single-part, it will be saved directly to the InboundMessage. Multi-part messages will be saved to InboundMessage when all the parts are received.
-    message = InboundMessageFragment(
-        messageId=form.cleaned_data['messageId'],
+    message = InboundMessage.new_message(
+        nexmo_message_id=form.cleaned_data['messageId'],
         message=form.cleaned_data['text'],
         sender=form.cleaned_data['msisdn'],
         concat_ref=form.cleaned_data['concat-ref'],
