@@ -47,7 +47,6 @@ def nexmo_message(request, key):
     if not form.is_valid():
         return HttpResponseBadRequest
 
-    # Magic happens in the InboundMessageFragment. If the message was single-part, it will be saved directly to the InboundMessage. Multi-part messages will be saved to InboundMessage when all the parts are received.
     message = InboundMessage.new_message(
         nexmo_message_id=form.cleaned_data['messageId'],
         message=form.cleaned_data['text'],
@@ -57,7 +56,6 @@ def nexmo_message(request, key):
         concat_total=form.cleaned_data['concat-total'],
         nexmo_timestamp=form.cleaned_data['message-timestamp'],
     )
-    message.save()
 
     # Nexmo expects a 200 response code
     return HttpResponse('')

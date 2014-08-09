@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from django.contrib import admin
+from django.utils.translation import ugettext as _
 
 from .models import (
     InboundMessage,
@@ -12,7 +13,7 @@ from .error_messages import (NEXMO_SEND_STATUS, NEXMO_STATUSES, UNKNOWN_STATUS,
 
 def send_status_explained(obj):
     return NEXMO_SEND_STATUS.get(obj.send_status, UNKNOWN_STATUS)
-send_status_explained.short_description = "Lähetysstatus"
+send_status_explained.short_description = _("Send status")
 
 def status_explained(obj):
     return NEXMO_DELIVERY_STATUS.get(obj.status, UNKNOWN_MESSAGE)
@@ -20,23 +21,23 @@ status_explained.short_description = "Status"
 
 def code_explained(obj):
     return NEXMO_MESSAGES.get(obj.error_code, UNKNOWN_STATUS)
-code_explained.short_description = "Virhestatus"
+code_explained.short_description = _("Error status")
 
 def status_msg_explained(obj):
     return NEXMO_STATUSES.get(obj.status_msg, UNKNOWN_STATUS)
-status_msg_explained.short_description = "Välitysstatus"
+status_msg_explained.short_description = _("Delivery status")
 
 class InboxAdmin(admin.ModelAdmin):
     model = InboundMessage
-    list_display = ['messageId', 'nexmo_timestamp', 'receive_timestamp', 'sender' , 'message']
-    readonly_fields = ['messageId', 'nexmo_timestamp', 'receive_timestamp', 'sender' , 'message']
+    list_display = ['nexmo_message_id', 'nexmo_timestamp', 'receive_timestamp', 'sender' , 'message']
+    readonly_fields = ['nexmo_message_id', 'nexmo_timestamp', 'receive_timestamp', 'sender' , 'message']
     def has_add_permission(self,request):
         return False
 
 class DSFAdmin(admin.TabularInline):
     model = DeliveryStatusFragment
-    readonly_fields = ['messageId', code_explained, status_msg_explained, 'status_timestamp']
-    fields = ['messageId', code_explained, status_msg_explained, 'status_timestamp']
+    readonly_fields = ['nexmo_message_id', code_explained, status_msg_explained, 'status_timestamp']
+    fields = ['nexmo_message_id', code_explained, status_msg_explained, 'status_timestamp']
     def has_add_permission(self,request):
         return False
 

@@ -1,0 +1,205 @@
+# encoding: utf-8
+
+msgid "Finnish"
+msgstr "Suomi"
+
+msgid "Message arrived to handset."
+msgstr "Viesti saapunut vastaanottajalle."
+
+msgid "Message timed out after we waited 48h to receive status from mobile operator."
+msgstr "Viestiä ei saatu toimitettua vastaanottajalle 48 tunnin kuluessa."
+
+msgid "Message failed to be delivered."
+msgstr "Viestin välitys perille epäonnistui."
+
+msgid "Message has been accepted by the mobile operator."
+msgstr "Operaattori hyväksyi viestin."
+
+msgid "Message is being delivered."
+msgstr "Viestiä välitetään."
+
+msgid "Un documented status from the mobile operator."
+msgstr "Dokumentoimaton virhe operaattorilta."
+
+msgid "Unknown status"
+msgstr "Tuntematon tila."
+
+msgid "Delivered"
+msgstr "Välitetty."
+
+msgid "Unknown error"
+msgstr "Tuntematon virhe."
+
+msgid "Absent Subscriber - Temporary"
+msgstr "Vastaanottaja ei ole verkossa - Väliaikainen virhe"
+
+msgid "Absent Subscriber - Permenant"
+msgstr "Vastaanottaja ei ole verkossa - Pysyvä virhe"
+
+msgid "Call barred by user"
+msgstr "Vastaanottaja hylkäsi puhelun."
+
+msgid "Portability Error"
+msgstr "Siirtovirhe."
+
+msgid "Anti-Spam Rejection"
+msgstr "Roskapostiesto."
+
+msgid "Handset Busy"
+msgstr "Vastaanottaja varattu."
+
+msgid "Network Error"
+msgstr "Verkkovirhe."
+
+msgid "Illegal Number"
+msgstr "Laiton numero."
+
+msgid "Invalid Message"
+msgstr "Virheellinen viesti."
+
+msgid "Unroutable"
+msgstr "Reititysvirhe"
+
+msgid "General Error"
+msgstr "Geneerinen virhe"
+
+msgid "Queued"
+msgstr "Jonossa"
+
+msgid "In Transit"
+msgstr "Lähetyksessä"
+
+msgid "Error in delivery"
+msgstr "Virhe viestin välityksessä."
+
+msgid "Success"
+msgstr "Onnistui"
+
+msgid "Throttled"
+msgstr "Kuristettu"
+
+msgid "Missing params"
+msgstr "Parametreja puuttuu"
+
+msgid "Invalid params"
+msgstr "Virheellinen parametri"
+
+msgid "Invalid credentials"
+msgstr "Virheellinen käyttäjätunnustiedot"
+
+msgid "Internal error"
+msgstr "Sisäinen virhe"
+
+msgid "Invalid message"
+msgstr "Virheellinen viesti"
+
+msgid "Number barred"
+msgstr "Numero vanhentunut"
+
+msgid "Partner account barred"
+msgstr "Käyttäjätunnustiedot vanhentuneet"
+
+msgid "Partner quota exceeded"
+msgstr "Kiintiö ylitetty"
+
+msgid "Account not enabled for REST"
+msgstr "Käyttäjätunnuksella ei oikeuksia RESTiin."
+
+msgid "Message too long"
+msgstr "Viesti liian pitkä"
+
+msgid "Communication Failed"
+msgstr "Kommunikaatio epäonnistui"
+
+msgid "Invalid Signature"
+msgstr "Virheellinen allekirjoitus"
+
+msgid "Invalid sender address"
+msgstr "Virheellinen lähettäjän osoite"
+
+msgid "Invalid TTL"
+msgstr "Virheellinen TTL"
+
+msgid "Facility not allowed"
+msgstr "Viestityyppiä ei sallittu"
+
+msgid "Invalid Message class"
+msgstr "Virheellinen viestityyppi"
+
+msgid "Nexmos identification"
+msgstr "Nexmon yksilöintitieto"
+
+msgid "Nexmo identifies different messages with this identification."
+msgstr "Nexmo erittelee eri viestit tällä yksilöintitiedolla."
+
+msgid "Sender"
+msgstr "Lähettäjä"
+
+msgid "Message receive time (nexmo)"
+msgstr "Viestin vastaanottohetki (nexmo)"
+
+msgid "Message receive time (local)"
+msgstr "Viestin vastaanottohetki (paikallinen)"
+
+msgid "Text message"
+msgstr "Tekstiviesti"
+
+msgid "Multi-part message identification"
+msgstr "Moniosaisen viestin yksilöintitieto"
+
+msgid "Nexmo identifies different message parts with this identification"
+msgstr "Nexmo erittelee viestin eri osat tällä yksilöintitiedolla."
+
+msgid "Multi-part message sequence number"
+msgstr "Moniosaisen viestin järjestysnumero"
+
+msgid "Multi-part message total amount of pieces."
+msgstr "Moniosaisen viestin palojen kokonaismäärä."
+
+msgid "Recipient"
+msgstr "Vastaanottaja"
+
+msgid "Send time"
+msgstr "Viestin lähetyshetki"
+
+msgid "Send status"
+msgstr "Lähetysstatus"
+
+msgid "Delivery status"
+msgstr "Välitysstatus"
+
+msgid "Message status"
+msgstr "Viestin status"
+
+msgid "Amount of physical messages"
+msgstr "Fyysisten viestien määrä"
+
+msgid "External reference"
+msgstr "Ulkoinen viittaus"
+
+msgid "Refers to event/program/poll/whatever."
+msgstr "Viittaus tapahtumaan/ohjelmaan/äänestykseen/whatnot."
+
+msgid "Error status"
+msgstr "Viestin virhestatus"
+
+msgid "Timestamp of status"
+msgstr "Statuksen saantihetki"
+
+msgid "Inbound Message Fragment"
+msgstr "Vastaanotettu viestipala"
+
+msgid "Inbound Message Fragments"
+msgstr "Vastaanotetut viestipalat"
+
+msgid "Inbound Message"
+msgstr "Vastaanotettu viesti"
+
+msgid "Inbound Messages"
+msgstr "Vastaanotetut viestit"
+
+msgid "Outbound Message"
+msgstr "Lähtevä viesti"
+
+msgid "Outbound Messages"
+msgstr "Lähtevät viestit"

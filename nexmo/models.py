@@ -2,10 +2,9 @@
 
 from .libpynexmo.nexmomessage import NexmoMessage
 
-from datetime import tzinfo,timedelta
-
 from django.conf import settings
 from django.db import models, connection
+from django.utils.translation import ugettext as _
 import django.dispatch
 
 message_received = django.dispatch.Signal(providing_args=["nexmo_message_id"])
@@ -14,86 +13,86 @@ class InboundMessageFragment(models.Model):
     
     nexmo_message_id = models.CharField(
         max_length=255,
-        verbose_name=u"Nexmon yksilöintitieto",
-        help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
+        verbose_name=_("Nexmos identification"),
+        help_text=_("Nexmo identifies different messages with this identification."),
     )
 
     sender = models.CharField(
         max_length=255,
-        verbose_name=u"Lähettäjä",
+        verbose_name=_("Sender"),
     )
 
     nexmo_timestamp = models.DateTimeField(
-        verbose_name=u'Viestin vastaanottohetki (nexmo)',
+        verbose_name=_('Message receive time (nexmo)'),
         null=True,
         blank=True,
     )
 
     receive_timestamp = models.DateTimeField(
-        verbose_name=u'Viestin vastaanottohetki (kompassi)',
+        verbose_name=_('Message receive time (local)'),
         auto_now=True,
     )
 
     message = models.TextField(
         blank=True,
-        verbose_name=u'Tekstiviesti',
+        verbose_name=_('Text message'),
     )
 
     concat_ref = models.CharField(
         max_length=255,
         null=True,
         blank=True,
-        verbose_name=u"Moniosaisen viestin yksilöintitieto",
-        help_text=u"Nexmo erittelee viestin eri osat tällä yksilöintitiedolla.",
+        verbose_name=_("Multi-part message identification"),
+        help_text=_("Nexmo identifies different message parts with this identification"),
     )
 
     concat_part = models.IntegerField(
         null=True,
         blank=True,
-        verbose_name=u"Moniosaisen viestin järjestysnumero",
+        verbose_name=_("Multi-part message sequence number"),
     )
 
     concat_total = models.IntegerField(
         null=True,
         blank=True,
-        verbose_name=u"Moniosaisen viestin palojen kokonaismäärä.",
+        verbose_name=_("Multi-part message total amount of pieces."),
     )
 
     def __unicode__(self):
         return self.message
 
     class Meta:
-        verbose_name = u'Inbound Message Fragment'
-        verbose_name_plural = u'Inbound Message Fragments'
+        verbose_name = _('Inbound Message Fragment')
+        verbose_name_plural = _('Inbound Message Fragments')
 
 class InboundMessage(models.Model):
 
     nexmo_message_id = models.CharField(
         max_length=255,
-        verbose_name=u"Nexmon yksilöintitieto",
-        help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
+        verbose_name=_("Nexmos identification"),
+        help_text=_("Nexmo identifies different messages with this identification."),
     )
 
     sender = models.CharField(
         max_length=255,
-        verbose_name=u"Lähettäjä",
+        verbose_name=_("Sender"),
     )
 
     nexmo_timestamp = models.DateTimeField(
-        verbose_name=u'Viestin vastaanottohetki (nexmo)',
+        verbose_name=_('Message receive time (nexmo)'),
         null=True,
         blank=True,
     )
 
     receive_timestamp = models.DateTimeField(
-        verbose_name=u'Viestin vastaanottohetki (kompassi)',
+        verbose_name=_('Message receive time (local)'),
         null=True,
         blank=True,
     )
 
     message = models.TextField(
         blank=True,
-        verbose_name=u'Tekstiviesti',
+        verbose_name=_('Text message'),
     )
 
     def save(self, *args, **kwargs):
@@ -105,45 +104,45 @@ class InboundMessage(models.Model):
         return ret_val
 
     @classmethod
-    def new_message(self, *args, **kwargs):
+    def new_message(cls, *args, **kwargs):
         # Needed to make Nexmos api happy, as it tests the callback url with no parameters (and expects 200 OK) when you configure it.
-        if self.nexmo_message_id is None:
+        if kwargs['nexmo_message_id'] is None:
             return True
         else:
-            if self.concat_ref:
+            if kwargs['concat_ref']:
                 fragment = InboundMessageFragment(
-                    nexmo_message_id=self.nexmo_message_id,
-                    message=self.message,
-                    sender=self.sender,
-                    concat_ref=self.concat_ref,
-                    concat_part=self.concat_part,
-                    concat_total=self.concat_total,
-                    nexmo_timestamp=self.nexmo_timestamp,
+                    nexmo_message_id=kwargs['nexmo_message_id'],
+                    message=kwargs['message'],
+                    sender=kwargs['sender'],
+                    concat_ref=kwargs['concat_ref'],
+                    concat_part=kwargs['concat_part'],
+                    concat_total=kwargs['concat_total'],
+                    nexmo_timestamp=kwargs['nexmo_timestamp'],
                     receive_timestamp=django.utils.timezone.now(),
                 )
                 fragment.save()
-                pieces = InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).order_by('concat_part')
+                pieces = InboundMessageFragment.objects.filter(concat_ref=kwargs['concat_ref']).order_by('concat_part')
                 if connection.vendor != "sqlite":
                     pieces = pieces.distinct("concat_part")
-                if len(pieces) >= self.concat_total:
+                if len(pieces) >= kwargs['concat_total']:
                     message_pieces = pieces.values_list('message', flat=True)
                     message = u"".join(message_pieces)
                     normal = InboundMessage(
-                        nexmo_message_id=self.nexmo_message_id,
+                        nexmo_message_id=kwargs['nexmo_message_id'],
                         message=message,
-                        sender=self.sender,
-                        nexmo_timestamp=self.nexmo_timestamp,
+                        sender=kwargs['sender'],
+                        nexmo_timestamp=kwargs['nexmo_timestamp'],
                         receive_timestamp=django.utils.timezone.now(),
                     )
                     normal.save()
-                    InboundMessageFragment.objects.filter(concat_ref=self.concat_ref).delete()
+                    InboundMessageFragment.objects.filter(concat_ref=kwargs['concat_ref']).delete()
 
             else:
                 normal = InboundMessage(
-                    nexmo_message_id=self.nexmo_message_id,
-                    message=self.message,
-                    sender=self.sender,
-                    nexmo_timestamp=self.nexmo_timestamp,
+                    nexmo_message_id=kwargs['nexmo_message_id'],
+                    message=kwargs['message'],
+                    sender=kwargs['sender'],
+                    nexmo_timestamp=kwargs['nexmo_timestamp'],
                     receive_timestamp=django.utils.timezone.now(),
                 )
                 normal.save()
@@ -152,55 +151,55 @@ class InboundMessage(models.Model):
         return self.message
 
     class Meta:
-        verbose_name = u'Inbound Message'
-        verbose_name_plural = u'Inbound Messages'
+        verbose_name = _('Inbound Message')
+        verbose_name_plural = _('Inbound Messages')
 
 class OutboundMessage(models.Model):
     
     message = models.TextField(
-        verbose_name=u'Tekstiviesti',
+        verbose_name=_('Text message'),
     )
     
     to = models.CharField(
         max_length=50,
-        verbose_name=u'Vastaanottaja',
+        verbose_name=_('Recipient'),
     )
 
     send_timestamp = models.DateTimeField(
-        verbose_name=u'Viestin lähetyshetki',
+        verbose_name=_('Send time'),
         null=True,
         blank=True,
     )
 
     send_status = models.IntegerField(
-        verbose_name=u'Lähetysstatus',
+        verbose_name=_('Send status'),
         null=True,
         blank=True,
     )
 
     status = models.IntegerField(
-        verbose_name=u'Viestin status',
+        verbose_name=_('Message status'),
         null=True,
         blank=True,
     )
 
     sent_pieces = models.IntegerField(
-        verbose_name=u'Fyysisten viestien määrä',
+        verbose_name=_('Amount of physical messages'),
         null=True,
         blank=True,
     )
 
     external_reference = models.CharField(
         max_length=255,
-        verbose_name=u'Ulkoinen viittaus',
-        help_text=u'Viittaus tapahtumaan/ohjelmaan/äänestykseen/whatnot.'
+        verbose_name=_('External reference'),
+        help_text=_('Refers to event/program/poll/whatever.'),
     )
 
     @classmethod
-    def send(self, *args, **kwargs):
-        message = OutboundMessage(message=self.message, to=self.to, external_reference=self.external_reference)
+    def send(cls, *args, **kwargs):
+        message = OutboundMessage(*args, **kwargs)
         message.save()
-        self._send(message)
+        message._send()
 
     def _send(self, *args, **kwargs):
         if self.message is None:
@@ -230,8 +229,8 @@ class OutboundMessage(models.Model):
         return response
 
     class Meta:
-        verbose_name = u'Outbound Message'
-        verbose_name_plural = u'Outbound Messages'
+        verbose_name = _('Outbound Message')
+        verbose_name_plural = _('Outbound Messages')
 
 class DeliveryStatusFragment(models.Model):
 
@@ -239,25 +238,25 @@ class DeliveryStatusFragment(models.Model):
 
     nexmo_message_id = models.CharField(
         max_length=255,
-        verbose_name=u"Nexmon yksilöintitieto",
-        help_text=u"Nexmo erittelee eri viestit tällä yksilöintitiedolla.",
+        verbose_name=_("Nexmos identification"),
+        help_text=_("Nexmo identifies different messages with this identification."),
     )
 
     error_code = models.IntegerField(
-        verbose_name=u'Viestin virhestatus',
+        verbose_name=_('Error status'),
         null=True,
         blank=True,
     )
 
     status_msg = models.CharField(
         max_length=50,
-        verbose_name=u'Viestin status',
+        verbose_name=_('Message status'),
         null=True,
         blank=True,
     )
 
     status_timestamp = models.DateTimeField(
-        verbose_name=u'Statuksen saantihetki',
+        verbose_name=_('Timestamp of status'),
         null=True,
         blank=True,
     )
