@@ -252,14 +252,8 @@ class DeliveryStatusFragment(models.Model):
 
 
 class RetryError(RuntimeError):
-    """Exception raised for errors which needs trying again after short wait.
-
-    Attributes:
-        msg  -- explanation of the error
-    """
-
-    def __init__(self, msg):
-        self.msg = msg
+    """Exception raised for errors which needs trying again after short wait."""
+    pass
 
 class Zone(tzinfo):
     def __init__(self,offset,isdst,name):

@@ -14,11 +14,11 @@ GMT = Zone(0,False,'GMT')
 def nexmo_delivery(request, key):
     if key != settings.NEXMO_INBOUND_KEY:
         return HttpResponseForbidden()
-    ref_id = int(request.POST.get('client-ref') or 0)
+    ref_id = int(request.POST.get('client-ref', 0))
     messageId = request.POST.get('messageId')
     timestamp = request.POST.get('message-timestamp')
     status_msg = request.POST.get('status')
-    error_id = int(request.POST.get('err-code') or 0)
+    error_id = int(request.POST.get('err-code', 0))
 
     GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=GMT)
 
@@ -39,8 +39,8 @@ def nexmo_message(request, key):
     message_text = request.POST.get('text')
     sender = request.POST.get('msisdn')
     concat_ref = request.POST.get('concat-ref')
-    concat_part = int(request.POST.get('concat-part') or 0 )
-    concat_total = int(request.POST.get('concat-total') or 0 )
+    concat_part = int(request.POST.get('concat-part', 0))
+    concat_total = int(request.POST.get('concat-total', 0))
     timestamp = request.POST.get('message-timestamp')
 
     GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=GMT)
