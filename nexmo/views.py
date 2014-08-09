@@ -1,34 +1,41 @@
-from django.http import HttpResponse, HttpResponseForbidden
-
 from datetime import datetime
 
-from .models import InboundMessageFragment, DeliveryStatusFragment, OutboundMessage, Zone
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseForbidden
+from django.utils.timezone import utc
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-GMT = Zone(0,False,'GMT')
+from .models import InboundMessageFragment, DeliveryStatusFragment, OutboundMessage
+
 
 @require_POST
 @csrf_exempt
 def nexmo_delivery(request, key):
     if key != settings.NEXMO_INBOUND_KEY:
         return HttpResponseForbidden()
-    ref_id = int(request.POST.get('client-ref') or 0)
-    messageId = request.POST.get('messageId')
-    timestamp = request.POST.get('message-timestamp')
-    status_msg = request.POST.get('status')
-    error_id = int(request.POST.get('err-code') or 0)
 
-    GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=GMT)
+    form = DeliveryForm(request.POST)
+
+    if not form.is_valid():
+        return HttpResponse('', status=400)
+
+    ref_id = form.cleaned_data.get('client-ref')
 
     if ref_id != 0:
         message = OutboundMessage.objects.get(pk=ref_id)
-        status = DeliveryStatusFragment(message=message, messageId=messageId, error_code=error_id, status_msg=status_msg, status_timestamp=GMTtimestamp)
+        status = DeliveryStatusFragment(
+            message=message,
+            messageId=form.cleaned_data['messageId'],
+            error_code=form.cleaned_data['err-code'],
+            status_msg=form.cleaned_data['status'],
+            status_timestamp=form.cleaned_data['message-timestamp'],
+        )
         status.save()
 
     # Nexmo expects a 200 response code
     return HttpResponse('')
+
 
 @require_POST
 @csrf_exempt
@@ -43,7 +50,7 @@ def nexmo_message(request, key):
     concat_total = int(request.POST.get('concat-total') or 0 )
     timestamp = request.POST.get('message-timestamp')
 
-    GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=GMT)
+    GMTtimestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').replace(tzinfo=utc)
 
     # Magic happens in the InboundMessageFragment. If the message was single-part, it will be saved directly to the InboundMessage. Multi-part messages will be saved to InboundMessage when all the parts are received.
     message = InboundMessageFragment(messageId=messageId, message=message_text, sender=sender, concat_ref=concat_ref, concat_part=concat_part, concat_total=concat_total, nexmo_timestamp=GMTtimestamp)
