@@ -22,13 +22,13 @@ msgid "Un documented status from the mobile operator."
 msgstr "Dokumentoimaton virhe operaattorilta."
 
 msgid "Unknown status"
-msgstr "Tuntematon tila."
+msgstr "Tuntematon tila"
 
 msgid "Delivered"
-msgstr "Välitetty."
+msgstr "Välitetty"
 
 msgid "Unknown error"
-msgstr "Tuntematon virhe."
+msgstr "Tuntematon virhe"
 
 msgid "Absent Subscriber - Temporary"
 msgstr "Vastaanottaja ei ole verkossa - Väliaikainen virhe"
@@ -40,22 +40,22 @@ msgid "Call barred by user"
 msgstr "Vastaanottaja hylkäsi puhelun."
 
 msgid "Portability Error"
-msgstr "Siirtovirhe."
+msgstr "Siirtovirhe"
 
 msgid "Anti-Spam Rejection"
-msgstr "Roskapostiesto."
+msgstr "Roskapostiesto"
 
 msgid "Handset Busy"
-msgstr "Vastaanottaja varattu."
+msgstr "Vastaanottaja varattu"
 
 msgid "Network Error"
-msgstr "Verkkovirhe."
+msgstr "Verkkovirhe"
 
 msgid "Illegal Number"
-msgstr "Laiton numero."
+msgstr "Laiton numero"
 
 msgid "Invalid Message"
-msgstr "Virheellinen viesti."
+msgstr "Virheellinen viesti"
 
 msgid "Unroutable"
 msgstr "Reititysvirhe"
@@ -67,10 +67,10 @@ msgid "Queued"
 msgstr "Jonossa"
 
 msgid "In Transit"
-msgstr "Lähetyksessä"
+msgstr "Toimituksessa"
 
 msgid "Error in delivery"
-msgstr "Virhe viestin välityksessä."
+msgstr "Virhe viestin välityksessä"
 
 msgid "Success"
 msgstr "Onnistui"

@@ -47,7 +47,7 @@ def nexmo_message(request, key):
     if not form.is_valid():
         return HttpResponseBadRequest
 
-    message = InboundMessage.new_message(
+    InboundMessage.new_message(
         nexmo_message_id=form.cleaned_data['messageId'],
         message=form.cleaned_data['text'],
         sender=form.cleaned_data['msisdn'],

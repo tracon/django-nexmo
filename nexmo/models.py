@@ -179,8 +179,7 @@ class OutboundMessage(models.Model):
 
     status = models.IntegerField(
         verbose_name=_('Message status'),
-        null=True,
-        blank=True,
+        default=0,
     )
 
     sent_pieces = models.IntegerField(
@@ -199,7 +198,7 @@ class OutboundMessage(models.Model):
     def send(cls, *args, **kwargs):
         message = OutboundMessage(*args, **kwargs)
         message.save()
-        message._send()
+        return message._send()
 
     def _send(self, *args, **kwargs):
         if self.message is None:
@@ -210,23 +209,26 @@ class OutboundMessage(models.Model):
             'api_secret': settings.NEXMO_PASSWORD,
             'from': settings.NEXMO_FROM,
             'to': self.to,
-            'client-ref': self.message.id,
+            'client-ref': self.id,
             'status-report-req': 1,
             'text': self.message.encode('utf-8'),
         }
 
         sms = NexmoMessage(params)
         response = sms.send_request()
-        self.message.sent_pieces = response['message-count']
-        self.message.status = 1
-        self.message.send_timestamp = django.utils.timezone.now()
+        self.sent_pieces = response['message-count']
+        self.status = 1
+        self.send_timestamp = django.utils.timezone.now()
         for resp in response['messages']:
-            self.message.send_status = resp['status']
-            self.message.save()
+            self.send_status = resp['status']
+            self.save()
             if resp['status'] == u'1':
                 # Throttled. Sending signal to retry.
                 raise RetryError("Throttled")
         return response
+
+    def __unicode__(self):
+        return self.message
 
     class Meta:
         verbose_name = _('Outbound Message')
@@ -261,7 +263,8 @@ class DeliveryStatusFragment(models.Model):
         blank=True,
     )
 
-    def handle_message_status(message):
+    @classmethod
+    def handle_message_status(cls, message, *args, **kwargs):
         pieces = DeliveryStatusFragment.objects.filter(message=message)
         message = OutboundMessage.objects.get(pk=message.id)
         if connection.vendor != "sqlite":

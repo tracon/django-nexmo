@@ -45,4 +45,8 @@ class MessageForm(forms.Form):
         if 'message-timestamp' in self.cleaned_data:
             self.cleaned_data['message-timestamp'] = self.cleaned_data['message-timestamp'].replace(tzinfo=utc)
 
+        if 'msisdn' in self.cleaned_data:
+            if not self.cleaned_data['msisdn'].startswith("+"):
+                self.cleaned_data['msisdn'] = u"+" + self.cleaned_data['msisdn']
+
         return cleaned_data
