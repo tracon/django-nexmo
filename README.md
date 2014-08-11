@@ -85,11 +85,11 @@ messages sends signal which you can catch f.ex. for processing hot words:
 
 ```python
 from django.dispatch import receiver
-from nexmo.models import InboundMessage
+from nexmo.models import InboundMessage, message_received
 
-@receiver(message_received, sender=InboundMessage)
+@receiver(message_received)
 def my_handler(sender, **kwargs):
-    message = InboundMessage.objects.filter(messageId=messageId)
+    message = InboundMessage.objects.filter(nexmo_message_id=kwargs['nexmo_message_id'])
     ...
 ```
 
