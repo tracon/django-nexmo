@@ -131,24 +131,25 @@ urlpatterns = patterns('',
 ```
 
 This will declare a callback view accessible through the
-http://your-site.url/nexmo/delivery/NEXMO_INBOUND_KEY/ url.
+`http://your-site.url/nexmo/delivery/NEXMO_INBOUND_KEY/` url.
 
 Copy this url and paste it in the "Callback URL" section of your "API settings"
 section of your Nexmo.com account and select POST in drop-down menu. Remember to replace NEXMO_INBOUND_KEY to whatever
 you set to settings. Hex numbers are allowed.
 
 Inbound text messages are received the same way. Receiving messages is accessible through the
-http://your-site.url/nexmo/message/NEXMO_INBOUND_KEY/ url.
+`http://your-site.url/nexmo/message/NEXMO_INBOUND_KEY/` url.
 
 Copy this url and and paste it in the "Numbers" section of your Nexmo.com account. You will need to buy number
 from Nexmo for this, and it will cost you monthly fee of few dollars (in U.S.A: $0.90/month, in Finland €3.00/month)
 
 ## Translations
 
-English (default) and Finnish is available for localization. If you want to translate status messages to different language, in nexmo/locale
-copy folder `fi` to new with desired language code. Then, translate the nexmo/locale/<new language code>/LC_MESSAGES/django.po. After that
-use command `msgfmt -o django.mo django.po` to compile it. Unfortunatelly we can't use django to create and compile these translations as it
-doesn't find any strings to put in .po-file (I don't know why). After that you need to add several things to your settings.py:
+English (default) and Finnish is available for localization. If you want to translate status messages to different language, in `nexmo/locale`
+copy folder `fi` to new with desired language code. Then, translate the `nexmo/locale/<new language code>/LC_MESSAGES/django.po`. After that
+use command `msgfmt -o django.mo django.po` to compile it, you need gettext installed for that. Unfortunatelly we can't use django to create
+and compile these translations as it doesn't find any strings to put in .po-file (I don't know why). After that you need to add several things
+to your settings.py:
 
 ```python
 MIDDLEWARE_CLASSES = (
