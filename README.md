@@ -58,14 +58,14 @@ Sending messages is little bit harder than basic usage:
 
 ```python
 from nexmo import OutboundMessage
-OutboundMessage.send(message=u'My sms message body', to=u'+123465789', external_reference=u'test')
+OutboundMessage.send(message=u'My sms message body', to=u'+33612345678', external_reference=u'test')
 ```
     
 or
 
 ```python
 from nexmo import OutboundMessage
-message = OutboundMessage(message=u'My sms message body', to=u'+123465789', external_reference=u'test')   
+message = OutboundMessage(message=u'My sms message body', to=u'+33612345678', external_reference=u'test')   
 message.save()
 message._send()
 ```
