@@ -71,8 +71,8 @@ message._send()
 ```
 
 Note the difference of these two. `send()` is classmethod, `_send()` normal. `_send()` is available for mass operations,
-which you probably want to use with celery or similar and save all messages before start sending. Both tracks delivery
-statuses, so only calling method differs.
+which you probably want to use with celery or similar and save all messages before start sending. Unsent messages have status
+"Queued" Both tracks delivery statuses, so only calling method differs.
 
 Nexmo allows 5 messages per second by default. If you are throttled, RetryError is raised. Messages and delivery data 
 are saved to the database.
