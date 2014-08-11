@@ -3,6 +3,7 @@
 msgid "Finnish"
 msgstr "Suomi"
 
+# Delivery Statuses of the fragments
 msgid "Message arrived to handset."
 msgstr "Viesti saapunut vastaanottajalle."
 
@@ -24,6 +25,8 @@ msgstr "Dokumentoimaton virhe operaattorilta."
 msgid "Unknown status"
 msgstr "Tuntematon tila"
 
+
+# Error codes of delivery statuses
 msgid "Delivered"
 msgstr "Välitetty"
 
@@ -63,6 +66,8 @@ msgstr "Reititysvirhe"
 msgid "General Error"
 msgstr "Geneerinen virhe"
 
+
+# Outbound message statuses
 msgid "Queued"
 msgstr "Jonossa"
 
@@ -72,6 +77,8 @@ msgstr "Toimituksessa"
 msgid "Error in delivery"
 msgstr "Virhe viestin välityksessä"
 
+
+# Send statuses
 msgid "Success"
 msgstr "Onnistui"
 
@@ -126,6 +133,7 @@ msgstr "Viestityyppiä ei sallittu"
 msgid "Invalid Message class"
 msgstr "Virheellinen viestityyppi"
 
+# Different strings in .models and .admin, shown mainly in admin panel.
 msgid "Nexmos identification"
 msgstr "Nexmon yksilöintitieto"
 
