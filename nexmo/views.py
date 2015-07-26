@@ -16,7 +16,7 @@ def nexmo_delivery(request, key):
     form = DeliveryForm(request.POST)
 
     if not form.is_valid():
-        return HttpResponseBadRequest
+        return HttpResponse('bad data')
 
     ref_id = form.cleaned_data.get('client-ref')
 
@@ -45,7 +45,7 @@ def nexmo_message(request, key):
     form = MessageForm(request.POST)
 
     if not form.is_valid():
-        return HttpResponseBadRequest
+        return HttpResponse('bad data')
 
     InboundMessage.new_message(
         nexmo_message_id=form.cleaned_data['messageId'],

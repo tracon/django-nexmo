@@ -4,13 +4,14 @@ from .libpynexmo.nexmomessage import NexmoMessage
 
 from django.conf import settings
 from django.db import models, connection
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 import django.dispatch
 
 message_received = django.dispatch.Signal(providing_args=["nexmo_message_id"])
 
+
 class InboundMessageFragment(models.Model):
-    
+
     nexmo_message_id = models.CharField(
         max_length=255,
         verbose_name=_("Nexmos identification"),
@@ -64,6 +65,7 @@ class InboundMessageFragment(models.Model):
     class Meta:
         verbose_name = _('Inbound Message Fragment')
         verbose_name_plural = _('Inbound Message Fragments')
+
 
 class InboundMessage(models.Model):
 
@@ -154,12 +156,13 @@ class InboundMessage(models.Model):
         verbose_name = _('Inbound Message')
         verbose_name_plural = _('Inbound Messages')
 
+
 class OutboundMessage(models.Model):
-    
+
     message = models.TextField(
         verbose_name=_('Text message'),
     )
-    
+
     to = models.CharField(
         max_length=50,
         verbose_name=_('Recipient'),
@@ -233,6 +236,7 @@ class OutboundMessage(models.Model):
     class Meta:
         verbose_name = _('Outbound Message')
         verbose_name_plural = _('Outbound Messages')
+
 
 class DeliveryStatusFragment(models.Model):
 

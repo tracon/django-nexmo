@@ -58,27 +58,27 @@ Sending messages is little bit harder than basic usage:
 
 ```python
 from nexmo import OutboundMessage
-OutboundMessage.send(message=u'My sms message body', to=u'+33612345678', external_reference=u'test')
+OutboundMessage.send(message=u'My sms message body', to=u'+33612345678')
 ```
     
 or
 
 ```python
 from nexmo import OutboundMessage
-message = OutboundMessage(message=u'My sms message body', to=u'+33612345678', external_reference=u'test')   
+message = OutboundMessage(message=u'My sms message body', to=u'+33612345678', external_reference=u'celery')   
 message.save()
 message._send()
 ```
 
 Note the difference of these two. `send()` is classmethod, `_send()` normal. `_send()` is available for mass operations,
 which you probably want to use with celery or similar and save all messages before start sending. Unsent messages have status
-"Queued" Both tracks delivery statuses, so only calling method differs.
+"Queued". Both tracks delivery statuses, so only calling method differs.
 
 Nexmo allows 5 messages per second by default. If you are throttled, RetryError is raised. Messages and delivery data 
 are saved to the database.
 
 External reference allows you to mark messages however you want. If you want to track which app send the message
-or which user account was used or whatever you want, you can put it there. You must put something.
+or which user account was used or whatever you want, you can put it there.
 
 If you have inbound number from Nexmo, you can receive text messages. Multi-part messages are supported. Inbound
 messages sends signal which you can catch f.ex. for processing hot words:
