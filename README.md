@@ -89,7 +89,8 @@ from nexmo.models import InboundMessage, message_received
 
 @receiver(message_received)
 def my_handler(sender, **kwargs):
-    message = InboundMessage.objects.filter(nexmo_message_id=kwargs['nexmo_message_id'])
+    messages = InboundMessage.objects.filter(nexmo_message_id=kwargs['nexmo_message_id'])
+    message = messages[0]  # Nexmo might try to deliver message multiple times so take only one occurence.
     ...
 ```
 
@@ -152,6 +153,10 @@ and compile these translations as it doesn't find any strings to put in .po-file
 to your settings.py:
 
 ```python
+from django.utils.translation import ugettext_lazy as _
+
+...
+
 MIDDLEWARE_CLASSES = (
     ...
     'django.middleware.locale.LocaleMiddleware',
