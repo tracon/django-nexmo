@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 outbox = []
 
-def send_message(to, message):
+def send_message(to, message, api_key=settings.NEXMO_USERNAME, api_secret=settings.NEXMO_PASSWORD):
     """Shortcut to send a sms using libnexmo api.
 
     Usage:
@@ -15,8 +15,8 @@ def send_message(to, message):
     >>> send_message('+33612345678', 'My sms message body')
     """
     params = {
-        'api_key': settings.NEXMO_USERNAME,
-        'api_secret': settings.NEXMO_PASSWORD,
+        'api_key': api_key,
+        'api_secret': api_secret,
         'from': settings.NEXMO_FROM,
         'to': to,
         'status-report-req': 0,
