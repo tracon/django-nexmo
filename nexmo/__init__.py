@@ -11,3 +11,5 @@ __all__ = [
     'OutboundMessage',
     'DeliveryStatusFragment',
     ]
+
+default_app_config = 'nexmo.apps.NexmoAppConfig'

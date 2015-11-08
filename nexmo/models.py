@@ -63,6 +63,7 @@ class InboundMessageFragment(models.Model):
         return self.message
 
     class Meta:
+        app_label = 'nexmo'
         verbose_name = _('Inbound Message Fragment')
         verbose_name_plural = _('Inbound Message Fragments')
 
@@ -153,6 +154,7 @@ class InboundMessage(models.Model):
         return self.message
 
     class Meta:
+        app_label = 'nexmo'
         verbose_name = _('Inbound Message')
         verbose_name_plural = _('Inbound Messages')
 
@@ -234,6 +236,7 @@ class OutboundMessage(models.Model):
         return self.message
 
     class Meta:
+        app_label = 'nexmo'
         verbose_name = _('Outbound Message')
         verbose_name_plural = _('Outbound Messages')
 
@@ -266,6 +269,9 @@ class DeliveryStatusFragment(models.Model):
         null=True,
         blank=True,
     )
+
+    class Meta:
+        app_label = 'nexmo'
 
     @classmethod
     def handle_message_status(cls, message, *args, **kwargs):
