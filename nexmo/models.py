@@ -129,7 +129,7 @@ class InboundMessage(models.Model):
                     pieces = pieces.distinct("concat_part")
                 if len(pieces) >= kwargs['concat_total']:
                     message_pieces = pieces.values_list('message', flat=True)
-                    message = u"".join(message_pieces)
+                    message = "".join(message_pieces)
                     normal = InboundMessage(
                         nexmo_message_id=kwargs['nexmo_message_id'],
                         message=message,
@@ -227,7 +227,7 @@ class OutboundMessage(models.Model):
         for resp in response['messages']:
             self.send_status = resp['status']
             self.save()
-            if resp['status'] == u'1':
+            if resp['status'] == '1':
                 # Throttled. Sending signal to retry.
                 raise RetryError("Throttled")
         return response

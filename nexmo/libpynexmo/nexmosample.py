@@ -29,7 +29,7 @@
 
 import sys
 
-from nexmomessage import NexmoMessage
+from .nexmomessage import NexmoMessage
 
 
 def main():
@@ -45,32 +45,32 @@ def main():
 
     # account balance
     req = {'api_secret': p, 'api_key': u, 'type': 'balance'}
-    print("request details: %s") % NexmoMessage(req).get_details()
-    print NexmoMessage(req).send_request()
+    print(("request details: %s") % NexmoMessage(req).get_details())
+    print(NexmoMessage(req).send_request())
 
-    print
+    print()
 
     # my numbers
     req = {'api_secret': p, 'api_key': u, 'type': 'numbers'}
-    print("request details: %s") % NexmoMessage(req).get_details()
-    print NexmoMessage(req).send_request()
+    print(("request details: %s") % NexmoMessage(req).get_details())
+    print(NexmoMessage(req).send_request())
 
-    print
+    print()
 
     # pricing for country 'NL'
     req['type'] = 'pricing'
     req['country'] = 'NL'
-    print("request details: %s") % NexmoMessage(req).get_details()
-    print NexmoMessage(req).send_request()
+    print(("request details: %s") % NexmoMessage(req).get_details())
+    print(NexmoMessage(req).send_request())
 
     # text message
     msg['text'] = m
     sms1 = NexmoMessage(msg)
-    print("SMS details: %s") % sms1.get_details()
+    print(("SMS details: %s") % sms1.get_details())
     m += " ktnxbye"
     sms1.set_text_info(m)
-    print("SMS details: %s") % sms1.get_details()
-    print sms1.send_request()
+    print(("SMS details: %s") % sms1.get_details())
+    print(sms1.send_request())
 
 if __name__ == "__main__":
     sys.exit(main())

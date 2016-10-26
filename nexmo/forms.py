@@ -47,6 +47,6 @@ class MessageForm(forms.Form):
 
         if 'msisdn' in self.cleaned_data:
             if not self.cleaned_data['msisdn'].startswith("+"):
-                self.cleaned_data['msisdn'] = u"+" + self.cleaned_data['msisdn']
+                self.cleaned_data['msisdn'] = "+" + self.cleaned_data['msisdn']
 
         return cleaned_data

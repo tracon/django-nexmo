@@ -25,9 +25,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-import urllib
-import urllib2
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import json
 
 BASEURL = "https://rest.nexmo.com"
@@ -60,12 +60,12 @@ class NexmoMessage:
         ]
 
     def url_fix(self, s, charset='utf-8'):
-        if isinstance(s, unicode):
+        if isinstance(s, str):
             s = s.encode(charset, 'ignore')
-        scheme, netloc, path, qs, anchor = urlparse.urlsplit(s)
-        path = urllib.quote(path, '/%')
-        qs = urllib.quote_plus(qs, ':&=')
-        return urlparse.urlunsplit((scheme, netloc, path, qs, anchor))
+        scheme, netloc, path, qs, anchor = urllib.parse.urlsplit(s)
+        path = urllib.parse.quote(path, '/%')
+        qs = urllib.parse.quote_plus(qs, ':&=')
+        return urllib.parse.urlunsplit((scheme, netloc, path, qs, anchor))
 
     def set_text_info(self, text):
         # automatically transforms msg to text SMS
@@ -156,7 +156,7 @@ class NexmoMessage:
             params.pop('reqtype')
             params.pop('server')
             server = "%s/sms/%s" % (BASEURL, self.sms['reqtype'])
-            self.request = server + "?" + urllib.urlencode(params)
+            self.request = server + "?" + urllib.parse.urlencode(params)
             return self.request
         return False
 
@@ -173,10 +173,10 @@ class NexmoMessage:
 
     def send_request_json(self, request):
         url = request
-        req = urllib2.Request(url=url)
+        req = urllib.request.Request(url=url)
         req.add_header('Accept', 'application/json')
         try:
-            return json.load(urllib2.urlopen(req))
+            return json.load(urllib.request.urlopen(req))
         except ValueError:
             return False
 
